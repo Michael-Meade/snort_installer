@@ -1,10 +1,19 @@
 require_relative 'utils'
 require 'colorize'
 task :install do 
-	stdout = Utils.check("snort -V")
-	if stdout.to_s.include?("Snort")
-		puts "Already Installed".red
-	else
+	begin
+		stdout = Utils.check("snort -V")
+		if stdout.to_s.include?("Snort")
+			puts "Already Installed".red
+		else
+			Utils.install.each do |install|
+				system(install)
+			end
+			Utils.snort_config.each do |config|
+				Utils.write_file("/etc/snort/snort.conf", config, 1)
+			end
+		end
+	rescue => e
 		Utils.install.each do |install|
 			system(install)
 		end
